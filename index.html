@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pure VideoPoker - No Ads</title>
+    <title>Pure VideoPoker</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -24,6 +24,7 @@
             margin: 0;
             padding: 10px;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         h1 { 
@@ -37,7 +38,7 @@
             width: 100%;
             max-width: 450px;
             background: var(--surface);
-            padding: 20px;
+            padding: 15px;
             border-radius: 20px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             text-align: center;
@@ -47,10 +48,10 @@
         .stats {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
             font-weight: bold;
-            padding: 0 10px;
+            padding: 0 5px;
         }
 
         .balance-box { color: var(--gold); }
@@ -58,25 +59,26 @@
 
         .message {
             height: 40px;
-            margin: 10px 0;
+            margin: 5px 0;
             font-weight: bold;
             color: white;
             font-size: 1.1rem;
             display: flex;
             align-items: center;
             justify-content: center;
+            text-transform: uppercase;
         }
 
         .cards-display {
             display: flex;
             justify-content: space-between;
-            gap: 5px;
-            margin-bottom: 25px;
-            min-height: 110px;
+            gap: 4px;
+            margin-bottom: 20px;
+            min-height: 100px;
         }
 
         .card {
-            width: 18%;
+            width: 18.5%;
             aspect-ratio: 2/3;
             background: var(--card-bg);
             border-radius: 6px;
@@ -96,18 +98,19 @@
 
         .card.held {
             border-color: var(--accent);
-            transform: translateY(-10px);
+            transform: translateY(-8px);
             box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
         }
 
         .card.held::after {
             content: "TENUTO";
             position: absolute;
-            top: -25px;
+            top: -22px;
             left: 0;
             width: 100%;
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             color: var(--accent);
+            font-weight: bold;
         }
 
         .card.red { color: var(--danger); }
@@ -115,51 +118,53 @@
         .controls {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
         }
 
         .bet-buttons {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
             align-items: center;
         }
 
         .btn-bet {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
             color: white;
             border: 1px solid var(--accent);
             padding: 8px 15px;
-            border-radius: 5px;
-            font-size: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
         }
 
         #deal-btn {
             background: linear-gradient(135deg, var(--accent), #00a8ff);
             border: none;
-            padding: 15px;
-            border-radius: 10px;
+            padding: 14px;
+            border-radius: 12px;
             color: var(--bg-color);
-            font-weight: bold;
-            font-size: 1.2rem;
+            font-weight: 800;
+            font-size: 1.1rem;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+            text-transform: uppercase;
         }
 
         #reload-btn {
             background: var(--danger);
             border: none;
             padding: 15px;
-            border-radius: 10px;
+            border-radius: 12px;
             color: white;
             font-weight: bold;
             display: none;
             width: 100%;
+            cursor: pointer;
         }
 
-        /* TABELLA INFO IN BASSO */
         .info-table {
-            margin-top: 30px;
+            margin-top: 25px;
             border-top: 1px solid rgba(255,255,255,0.1);
             padding-top: 15px;
             text-align: left;
@@ -167,19 +172,21 @@
 
         .info-title {
             color: var(--accent);
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             margin-bottom: 8px;
             letter-spacing: 1px;
+            opacity: 0.8;
         }
 
         .info-table table {
             width: 100%;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #94a3b8;
+            border-collapse: collapse;
         }
 
-        .info-table td { padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .info-table td { padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
         .info-table td:last-child { text-align: right; color: var(--gold); font-weight: bold; }
 
     </style>
@@ -194,7 +201,7 @@
             <div class="bet-box">Puntata: <span id="current-bet">5</span></div>
         </div>
 
-        <div class="message" id="status-msg">Buona fortuna! 🃏</div>
+        <div class="message" id="status-msg">Pronto? 🃏</div>
 
         <div class="cards-display" id="cards-row">
             <div class="card">?</div>
@@ -206,21 +213,24 @@
 
         <div class="controls">
             <div class="bet-buttons">
-                <button class="btn-bet" onclick="changeBet(-5)">-5</button>
-                <button class="btn-bet" onclick="changeBet(5)">+5</button>
+                <button class="btn-bet" onclick="changeBet(-5)">Puntata -5</button>
+                <button class="btn-bet" onclick="changeBet(5)">Puntata +5</button>
             </div>
             <button id="deal-btn" onclick="handleDeal()">DISTRIBUISCI</button>
-            <button id="reload-btn" onclick="resetGame()">FINITO I SOLDI? RICARICA 100</button>
+            <button id="reload-btn" onclick="resetGame()">SOLDI FINITI! RICARICA 100</button>
         </div>
 
         <div class="info-table">
-            <div class="info-title">Premi (Moltiplicatori)</div>
+            <div class="info-title">Tabella Pagamenti</div>
             <table>
+                <tr><td>SCALA REALE (10-A stesso seme)</td><td>x250</td></tr>
                 <tr><td>POKER (4 carte uguali)</td><td>x25</td></tr>
-                <tr><td>FULL (Tris + Coppia)</td><td>x9</td></tr>
+                <tr><td>FULL HOUSE (Tris + Coppia)</td><td>x9</td></tr>
+                <tr><td>COLORE (5 carte stesso seme)</td><td>x6</td></tr>
+                <tr><td>SCALA (5 carte in sequenza)</td><td>x4</td></tr>
                 <tr><td>TRIS (3 carte uguali)</td><td>x3</td></tr>
                 <tr><td>DOPPIA COPPIA</td><td>x2</td></tr>
-                <tr><td>COPPIA DI JACK O SUPERIORE</td><td>x1</td></tr>
+                <tr><td>COPPIA DI JACK, Q, K o A</td><td>x1</td></tr>
             </table>
         </div>
     </div>
@@ -266,7 +276,9 @@
         function changeBet(amount) {
             if (gameState !== "DEAL") return;
             let newBet = bet + amount;
-            if (newBet >= 5 && newBet <= balance) bet = newBet;
+            if (newBet >= 5 && newBet <= Math.max(balance, 5)) {
+                bet = newBet;
+            }
             updateUI();
         }
 
@@ -291,14 +303,18 @@
 
         function handleDeal() {
             if (gameState === "DEAL") {
-                if (balance < bet) return;
+                if (balance < bet) {
+                    alert("Crediti insufficienti! Riduci la puntata o ricarica.");
+                    return;
+                }
                 balance -= bet;
                 createDeck();
                 hand = deck.splice(0, 5);
                 heldIndices.clear();
                 gameState = "DRAW";
                 document.getElementById('deal-btn').innerText = "CAMBIA CARTE";
-                document.getElementById('status-msg').innerText = "Tocca le carte per tenerle";
+                document.getElementById('status-msg').innerText = "Scegli cosa tenere";
+                document.getElementById('status-msg').style.color = "white";
             } else {
                 for (let i = 0; i < 5; i++) {
                     if (!heldIndices.has(i)) hand[i] = deck.splice(0, 1)[0];
@@ -306,6 +322,8 @@
                 checkWin();
                 gameState = "DEAL";
                 document.getElementById('deal-btn').innerText = "DISTRIBUISCI";
+                if (bet > balance) bet = Math.max(5, Math.floor(balance/5)*5);
+                if (balance < 5 && balance > 0) bet = balance; 
             }
             renderCards();
             updateUI();
@@ -314,6 +332,11 @@
         function checkWin() {
             const counts = {};
             hand.forEach(c => counts[c.value] = (counts[c.value] || 0) + 1);
+            
+            const valNums = hand.map(c => valMap[c.value]).sort((a, b) => a - b);
+            const isFlush = hand.every(c => c.suit === hand[0].suit);
+            const isStraight = valNums.every((val, i) => i === 0 || val === valNums[i-1] + 1);
+            
             const valCounts = Object.values(counts);
             const pairs = valCounts.filter(v => v === 2).length;
             const tris = valCounts.some(v => v === 3);
@@ -322,15 +345,16 @@
             let winMultiplier = 0;
             let msg = "Nessuna combinazione";
 
-            if (poker) { winMultiplier = 25; msg = "POKER! 🏆"; }
+            if (isFlush && isStraight && valNums[0] === 10) { winMultiplier = 250; msg = "SCALA REALE! 🔥"; }
+            else if (poker) { winMultiplier = 25; msg = "POKER! 🏆"; }
             else if (tris && pairs === 1) { winMultiplier = 9; msg = "FULL HOUSE! 🔥"; }
+            else if (isFlush) { winMultiplier = 6; msg = "COLORE!"; }
+            else if (isStraight) { winMultiplier = 4; msg = "SCALA!"; }
             else if (tris) { winMultiplier = 3; msg = "TRIS!"; }
             else if (pairs === 2) { winMultiplier = 2; msg = "DOPPIA COPPIA"; }
             else if (pairs === 1) {
                 const pairValue = Object.keys(counts).find(k => counts[k] === 2);
-                if (valMap[pairValue] >= 11) {
-                    winMultiplier = 1; msg = "COPPIA DI JACK+";
-                }
+                if (valMap[pairValue] >= 11) { winMultiplier = 1; msg = "COPPIA DI JACK+"; }
             }
 
             if (winMultiplier > 0) {
@@ -339,7 +363,7 @@
                 document.getElementById('status-msg').style.color = "var(--gold)";
                 document.getElementById('status-msg').innerText = `${msg} (+${winAmount})`;
             } else {
-                document.getElementById('status-msg').style.color = "white";
+                document.getElementById('status-msg').style.color = "#94a3b8";
                 document.getElementById('status-msg').innerText = msg;
             }
         }
@@ -349,6 +373,7 @@
             bet = 5;
             gameState = "DEAL";
             document.getElementById('status-msg').innerText = "Ricarica effettuata!";
+            document.getElementById('status-msg').style.color = "white";
             updateUI();
             hand = [];
             const row = document.getElementById('cards-row');
