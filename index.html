@@ -8,7 +8,7 @@
         :root {
             --bg-color: #0f172a;
             --card-bg: #ffffff;
-            --accent: #00d4ff;
+            --accent: #00d4ff; /* Azzurro Neon per le carte tenute */
             --gold: #fcc200;
             --danger: #ff4d4d;
             --surface: #1e293b;
@@ -25,6 +25,7 @@
             padding: 10px;
             min-height: 100vh;
             overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent; /* Rimuove il flash al tocco su mobile */
         }
 
         h1 { 
@@ -32,6 +33,7 @@
             margin: 10px 0; 
             text-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
             font-size: 1.8rem;
+            letter-spacing: 1px;
         }
 
         #game-container {
@@ -43,6 +45,7 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             text-align: center;
             box-sizing: border-box;
+            position: relative;
         }
 
         .stats {
@@ -67,14 +70,17 @@
             align-items: center;
             justify-content: center;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
+        /* Area Carte - Aggiunto padding superiore per lasciare spazio all'animazione */
         .cards-display {
             display: flex;
             justify-content: space-between;
             gap: 4px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             min-height: 100px;
+            padding-top: 15px; 
         }
 
         .card {
@@ -87,31 +93,24 @@
             justify-content: center;
             align-items: center;
             color: black;
-            font-weight: bold;
-            font-size: 1.1rem;
+            font-weight: 800; /* Più spesso per leggere meglio */
+            font-size: 1.2rem;
             cursor: pointer;
-            transition: all 0.2s ease;
-            border: 3px solid transparent;
+            transition: transform 0.25s ease-out, box-shadow 0.25s ease-out, border-color 0.25s ease-out;
+            border: 2px solid transparent; /* Bordo base sottile */
             user-select: none;
             position: relative;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3); /* Ombra base */
         }
 
+        /* Effetto quando la carta è TENUTA (Held) */
         .card.held {
-            border-color: var(--accent);
-            transform: translateY(-8px);
-            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+            transform: translateY(-15px); /* Si alza di più per chiarezza */
+            border-color: var(--accent); /* Bordo Neon Azzurro */
+            box-shadow: 0 10px 25px rgba(0, 212, 255, 0.6); /* Ombra Neon profonda */
         }
 
-        .card.held::after {
-            content: "TENUTO";
-            position: absolute;
-            top: -22px;
-            left: 0;
-            width: 100%;
-            font-size: 0.55rem;
-            color: var(--accent);
-            font-weight: bold;
-        }
+        /* Rimosso il pseudo-elemento ::after che conteneva la scritta "TENUTO" */
 
         .card.red { color: var(--danger); }
 
@@ -119,6 +118,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            margin-top: 10px;
         }
 
         .bet-buttons {
@@ -136,58 +136,73 @@
             border-radius: 8px;
             font-size: 0.9rem;
             cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .btn-bet:active {
+            background: rgba(0, 212, 255, 0.2);
         }
 
         #deal-btn {
             background: linear-gradient(135deg, var(--accent), #00a8ff);
             border: none;
-            padding: 14px;
+            padding: 16px;
             border-radius: 12px;
             color: var(--bg-color);
             font-weight: 800;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
             text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        
+        #deal-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3);
         }
 
         #reload-btn {
             background: var(--danger);
             border: none;
-            padding: 15px;
+            padding: 16px;
             border-radius: 12px;
             color: white;
             font-weight: bold;
             display: none;
             width: 100%;
             cursor: pointer;
+            font-size: 1.1rem;
+            text-transform: uppercase;
         }
 
         .info-table {
-            margin-top: 25px;
+            margin-top: 30px;
             border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 15px;
+            padding-top: 18px;
             text-align: left;
         }
 
         .info-title {
             color: var(--accent);
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
-            margin-bottom: 8px;
-            letter-spacing: 1px;
-            opacity: 0.8;
+            margin-bottom: 10px;
+            letter-spacing: 1.5px;
+            opacity: 0.9;
+            font-weight: bold;
         }
 
         .info-table table {
             width: 100%;
-            font-size: 0.7rem;
-            color: #94a3b8;
+            font-size: 0.75rem;
+            color: #a7b3c5;
             border-collapse: collapse;
         }
 
-        .info-table td { padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
-        .info-table td:last-child { text-align: right; color: var(--gold); font-weight: bold; }
+        .info-table td { padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .info-table td:last-child { text-align: right; color: var(--gold); font-weight: bold; font-size: 0.8rem; }
 
     </style>
 </head>
@@ -204,12 +219,7 @@
         <div class="message" id="status-msg">Pronto? 🃏</div>
 
         <div class="cards-display" id="cards-row">
-            <div class="card">?</div>
-            <div class="card">?</div>
-            <div class="card">?</div>
-            <div class="card">?</div>
-            <div class="card">?</div>
-        </div>
+            </div>
 
         <div class="controls">
             <div class="bet-buttons">
@@ -236,6 +246,7 @@
     </div>
 
     <script>
+        // Logica di gioco invariata, aggiornata solo per riflettere le modifiche UI
         let balance = 100;
         let bet = 5;
         let deck = [];
@@ -289,9 +300,24 @@
             renderCards();
         }
 
-        function renderCards() {
+        function renderCards(initial = false) {
             const row = document.getElementById('cards-row');
             row.innerHTML = '';
+            
+            if (initial || hand.length === 0) {
+                // Stato coperto
+                for(let i=0; i<5; i++) {
+                    const div = document.createElement('div');
+                    div.className = 'card back';
+                    div.style.background = 'var(--accent)'; // Dorso colorato neon
+                    div.style.color = 'var(--surface)';
+                    div.style.fontSize = '2rem';
+                    div.innerText = '♠'; // Simbolo sul dorso
+                    row.appendChild(div);
+                }
+                return;
+            }
+
             hand.forEach((card, i) => {
                 const div = document.createElement('div');
                 div.className = `card ${card.color} ${heldIndices.has(i) ? 'held' : ''}`;
@@ -313,7 +339,7 @@
                 heldIndices.clear();
                 gameState = "DRAW";
                 document.getElementById('deal-btn').innerText = "CAMBIA CARTE";
-                document.getElementById('status-msg').innerText = "Scegli cosa tenere";
+                document.getElementById('status-msg').innerText = "Tocca le carte per tenerle";
                 document.getElementById('status-msg').style.color = "white";
             } else {
                 for (let i = 0; i < 5; i++) {
@@ -363,7 +389,7 @@
                 document.getElementById('status-msg').style.color = "var(--gold)";
                 document.getElementById('status-msg').innerText = `${msg} (+${winAmount})`;
             } else {
-                document.getElementById('status-msg').style.color = "#94a3b8";
+                document.getElementById('status-msg').style.color = "#a7b3c5";
                 document.getElementById('status-msg').innerText = msg;
             }
         }
@@ -376,10 +402,11 @@
             document.getElementById('status-msg').style.color = "white";
             updateUI();
             hand = [];
-            const row = document.getElementById('cards-row');
-            row.innerHTML = '<div class="card">?</div>'.repeat(5);
+            renderCards(true); // Stato iniziale coperto
         }
 
+        // Inizializzazione
+        renderCards(true);
         updateUI();
     </script>
 </body>
