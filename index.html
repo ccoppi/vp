@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pure VideoPoker</title>
+    <style>
+        :root {
+            --bg-color: #1a1a2e;
+            --card-bg: #ffffff;
+            --accent: #00d4ff;
+            --gold: #fcc200;
+            --danger: #ff4d4d;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 10px;
+            touch-action: manipulation;
+        }
+
+        h1 { color: var(--accent); margin-bottom: 10px; text-shadow: 0 0 10px var(--accent); }
+
+        #game-container {
+            width: 100%;
+            max-width: 500px;
+            background: #16213e;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .cards-display {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            min-height: 120px;
+        }
+
+        .card {
+            width: 18%;
+            aspect-ratio: 2/3;
+            background: var(--card-bg);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: black;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 3px solid transparent;
+            user-select: none;
+        }
+
+        .card.held {
+            border-color: var(--accent);
+            transform: translateY(-10px);
+            box-shadow: 0 0 15px var(--accent);
+        }
+
+        .card.red { color: var(--danger); }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .bet-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        button {
+            background: var(--accent);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            color: var(--bg-color);
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        button:disabled { background: #555; cursor: not-allowed; }
+
+        #deal-btn { background: var(--gold); font-size: 1.3rem; width: 100%; }
+
+        .message {
+            height: 30px;
+            margin: 15px 0;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        #reload-btn {
+            background: var(--danger);
+            color: white;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>VIDEO POKER</h1>
+
+    <div id="game-container">
+        <div class="stats">
+            <div>💰 <span id="balance">100</span></div>
+            <div>Puntata: <span id="current-bet">5</span></div>
+        </div>
+
+        <div class="message" id="status-msg">Inizia la partita!</div>
+
+        <div class="cards-display" id="cards-row">
+            <div class="card">?</div>
+            <div class="card">?</div>
+            <div class="card">?</div>
+            <div class="card">?</div>
+            <div class="card">?</div>
+        </div>
+
+        <div class="controls">
+            <div class="bet-controls">
+                <button onclick="changeBet(-5)">-5</button>
+                <button onclick="changeBet(5)">+5</button>
+            </div>
+            <button id="deal-btn" onclick="handleDeal()">DISTRIBUISCI</button>
+            <button id="reload-btn" onclick="resetGame()">RICARICA 100 MONETE</button>
+        </div>
+    </div>
+
+    <script>
+        let balance = 100;
+        let bet = 5;
+        let deck = [];
+        let hand = [];
+        let heldIndices = new Set();
+        let gameState = "DEAL"; // DEAL o DRAW
+
+        const suits = ['♠', '♣', '♥', '♦'];
+        const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+
+        function createDeck() {
+            deck = [];
+            for (let s of suits) {
+                for (let v of values) {
+                    deck.push({ value: v, suit: s, color: (s === '♥' || s === '♦') ? 'red' : 'black' });
+                }
+            }
+            deck.sort(() => Math.random() - 0.5);
+        }
+
+        function updateUI() {
+            document.getElementById('balance').innerText = balance;
+            document.getElementById('current-bet').innerText = bet;
+            
+            if (balance <= 0 && gameState === "DEAL") {
+                document.getElementById('reload-btn').style.display = 'block';
+                document.getElementById('deal-btn').style.display = 'none';
+            } else {
+                document.getElementById('reload-btn').style.display = 'none';
+                document.getElementById('deal-btn').style.display = 'block';
+            }
+        }
+
+        function changeBet(amount) {
+            if (gameState !== "DEAL") return;
+            let newBet = bet + amount;
+            if (newBet >= 5 && newBet <= balance) bet = newBet;
+            updateUI();
+        }
+
+        function toggleHold(index) {
+            if (gameState !== "DRAW") return;
+            if (heldIndices.has(index)) heldIndices.delete(index);
+            else heldIndices.add(index);
+            renderCards();
+        }
+
+        function renderCards() {
+            const row = document.getElementById('cards-row');
+            row.innerHTML = '';
+            hand.forEach((card, i) => {
+                const div = document.createElement('div');
+                div.className = `card ${card.color} ${heldIndices.has(i) ? 'held' : ''}`;
+                div.innerHTML = `<span>${card.value}</span><span>${card.suit}</span>`;
+                div.onclick = () => toggleHold(i);
+                row.appendChild(div);
+            });
+        }
+
+        function handleDeal() {
+            if (gameState === "DEAL") {
+                if (balance < bet) return;
+                balance -= bet;
+                createDeck();
+                hand = deck.splice(0, 5);
+                heldIndices.clear();
+                gameState = "DRAW";
+                document.getElementById('deal-btn').innerText = "CAMBIA CARTE";
+                document.getElementById('status-msg').innerText = "Seleziona le carte da tenere";
+            } else {
+                for (let i = 0; i < 5; i++) {
+                    if (!heldIndices.has(i)) {
+                        hand[i] = deck.splice(0, 1)[0];
+                    }
+                }
+                checkWin();
+                gameState = "DEAL";
+                document.getElementById('deal-btn').innerText = "DISTRIBUISCI";
+            }
+            renderCards();
+            updateUI();
+        }
+
+        function checkWin() {
+            const counts = {};
+            hand.forEach(c => counts[c.value] = (counts[c.value] || 0) + 1);
+            const pairs = Object.values(counts).filter(v => v === 2).length;
+            const tris = Object.values(counts).some(v => v === 3);
+            const poker = Object.values(counts).some(v => v === 4);
+            
+            let winMultiplier = 0;
+            let msg = "Nessuna combinazione";
+
+            if (poker) { winMultiplier = 25; msg = "POKER! 🏆"; }
+            else if (tris && pairs === 1) { winMultiplier = 9; msg = "FULL HOUSE! 🔥"; }
+            else if (tris) { winMultiplier = 3; msg = "TRIS!"; }
+            else if (pairs === 2) { winMultiplier = 2; msg = "DOPPIA COPPIA"; }
+            else if (pairs === 1) {
+                // Jacks or Better
+                const pairValue = Object.keys(counts).find(k => counts[k] === 2);
+                if (['J', 'Q', 'K', 'A'].includes(pairValue)) {
+                    winMultiplier = 1; msg = "COPPIA DI JACK+";
+                }
+            }
+
+            if (winMultiplier > 0) {
+                const winAmount = bet * winMultiplier;
+                balance += winAmount;
+                document.getElementById('status-msg').innerText = `${msg} (+${winAmount})`;
+            } else {
+                document.getElementById('status-msg').innerText = msg;
+            }
+        }
+
+        function resetGame() {
+            balance = 100;
+            bet = 5;
+            gameState = "DEAL";
+            document.getElementById('status-msg').innerText = "Gioco resettato!";
+            updateUI();
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
